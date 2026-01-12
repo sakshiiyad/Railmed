@@ -1,0 +1,43 @@
+{
+    "version": "1.0",
+    "lastUpdated": "2025-03-22",
+    "languages": ["English", "Hindi", "Tamil", "Bengali"],
+    "categories": {
+        "emergency": [
+            {
+                "english": "I need medical help",
+                "hindi": "मुझे चिकित्सा सहायता की आवश्यकता है",
+                "tamil": "எனக்கு மருத்துவ உதவி தேவை",
+                "bengali": "আমার চিকিৎসা সহায়তা প্রয়োজন"
+            },
+            {
+                "english": "Call an ambulance",
+                "hindi": "एम्बुलेंस बुलाएं",
+                "tamil": "ஆம்புலன்ஸ் அழைக்கவும்",
+                "bengali": "অ্যাম্বুলেন্স ডাকুন"
+            }
+        ],
+        "symptoms": [
+            {
+                "english": "I have chest pain",
+                "hindi": "मुझे छाती में दर्द है",
+                "tamil": "எனக்கு மார்பு வலி உள்ளது",
+                "bengali": "আমার বুকে ব্যথা"
+            },
+            {
+                "english": "I feel dizzy",
+                "hindi": "मुझे चक्कर आ रहा है",
+                "tamil": "எனக்கு தலை சுற்றுகிறது",
+                "bengali": "আমার মাথা ঘুরছে"
+            }
+        ],
+        "basic": [
+            {
+                "english": "Where is the nearest hospital?",
+                "hindi": "नजदीकी अस्पताल कहाँ है?",
+                "tamil": "அருகிலுள்ள மருத்துவமனை எங்கே?",
+                "bengali": "কাছাকাছি হাসপাতাল কোথায়?"
+            }
+        ]
+    }
+}

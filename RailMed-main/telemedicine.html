@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailMed - Telemedicine Consultation</title>
+    <link rel="icon" type="image/png" href="\Railway_Project\image\Screenshot 2025-02-28 111111.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #1B3E8C;
+            --secondary-blue: #5A9BD5;
+            --accent-red: #e63946;
+            --light-red: #ffd6d6;
+            --light-gray: #f5f5f5;
+            --success-green: #4CAF50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: var(--light-gray);
+        }
+
+        header {
+            background: linear-gradient(to right, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: auto;
+        }
+
+        nav {
+            background: var(--secondary-blue);
+            padding: 1rem;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .connection-details {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .peer-id-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .peer-id-container h3 {
+            color: var(--primary-blue);
+            margin: 0;
+        }
+
+        .connect-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .connect-form input {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-width: 200px;
+        }
+
+        .connect-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .connect-btn:hover {
+            background: var(--accent-red);
+            transform: translateY(-2px);
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .video-container {
+            background: black;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-container.local {
+            border: 3px solid var(--primary-blue);
+        }
+
+        .video-container.remote {
+            border: 3px solid var(--accent-red);
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            border-radius: 50px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .control-btn.mute {
+            color: var(--primary-blue);
+        }
+
+        .control-btn.video {
+            color: var(--secondary-blue);
+        }
+
+        .control-btn.end-call {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .waiting-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .chat-container {
+            position: fixed;
+            right: 2rem;
+            bottom: 2rem;
+            width: 300px;
+            height: 400px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: var(--primary-blue);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+        }
+
+        .chat-input button {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+        }
+
+        .message {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            max-width: 80%;
+        }
+
+        .message.sent {
+            background: var(--primary-blue);
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.received {
+            background: var(--light-gray);
+        }
+
+        .connection-info {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background: #666;
+            transition: background-color 0.3s;
+        }
+
+        .status-indicator.connected {
+            background: #4CAF50;
+            animation: blink 1.5s infinite;
+        }
+
+        .status-indicator.disconnected {
+            background: #f44336;
+        }
+
+        .status-indicator.connecting {
+            background: #ff9800;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-left: 2rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .user-name {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.3rem;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="image/Screenshot 2025-02-28 111111.png" alt="RailMed Logo" class="logo">
+            <h1>RailMed Telemedicine</h1>
+        </div>
+        <div class="connection-status">
+            <span class="status-indicator"></span>
+            <span class="status-text">Initializing...</span>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="analyzer.html">Health Analyzer</a></li>
+            <li><a href="railhealth_offline.html">RailHealth Offline</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="connection-details">
+            <div class="peer-id-container">
+                <h3>Your ID: <span id="peerId">Connecting...</span></h3>
+                <div class="connect-form">
+                    <input type="text" id="remotePeerId" placeholder="Enter doctor's ID">
+                    <button id="connectBtn" class="connect-btn">Connect</button>
+                </div>
+            </div>
+        </div>
+        <div class="video-grid">
+            <div class="video-container local">
+                <video id="localVideo" autoplay muted playsinline></video>
+            </div>
+            <div class="video-container remote">
+                <video id="remoteVideo" autoplay playsinline></video>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn mute" id="toggleAudio">
+            <i class="fas fa-microphone"></i>
+        </button>
+        <button class="control-btn video" id="toggleVideo">
+            <i class="fas fa-video"></i>
+        </button>
+        <button class="control-btn end-call" id="endCall">
+            <i class="fas fa-phone-slash"></i>
+        </button>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <h3>Chat</h3>
+            <button id="toggleChat">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Type a message...">
+            <button id="sendMessage">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="waiting-screen" id="waitingScreen">
+        <div class="spinner"></div>
+        <h2>Connecting to doctor...</h2>
+        <p>Please wait while we establish a secure connection</p>
+    </div>
+
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script>
+        // Check authentication
+        function checkAuth() {
+            const userToken = sessionStorage.getItem('userToken');
+            if (!userToken) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            // Parse the token and get user info
+            const payload = parseJwt(userToken);
+            // Update UI with user info
+            updateUserInfo(payload);
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+
+        function updateUserInfo(userInfo) {
+            const userDisplay = document.createElement('div');
+            userDisplay.className = 'user-display';
+            userDisplay.innerHTML = `
+                <img src="${userInfo.picture}" alt="Profile" class="user-avatar">
+                <span class="user-name">${userInfo.name}</span>
+                <button onclick="logout()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            `;
+            document.querySelector('.logo-container').appendChild(userDisplay);
+        }
+
+        function logout() {
+            sessionStorage.removeItem('userToken');
+            window.location.href = 'auth.html';
+        }
+
+        // Initialize PeerJS
+        const peer = new Peer(undefined, {
+            host: 'localhost',
+            port: 9000,
+            path: '/myapp'
+        });
+
+        let localStream;
+        let remoteStream;
+        let currentCall;
+        let dataConnection;
+
+        // Get DOM elements
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const toggleAudioBtn = document.getElementById('toggleAudio');
+        const toggleVideoBtn = document.getElementById('toggleVideo');
+        const endCallBtn = document.getElementById('endCall');
+        const waitingScreen = document.getElementById('waitingScreen');
+        const statusIndicator = document.querySelector('.status-indicator');
+        const statusText = document.querySelector('.status-text');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendMessageBtn = document.getElementById('sendMessage');
+        const toggleChatBtn = document.getElementById('toggleChat');
+        const peerIdDisplay = document.getElementById('peerId');
+        const remotePeerIdInput = document.getElementById('remotePeerId');
+        const connectBtn = document.getElementById('connectBtn');
+
+        // Handle peer connection events
+        peer.on('open', (id) => {
+            peerIdDisplay.textContent = id;
+            updateConnectionStatus('Connected to server', 'connecting');
+        });
+
+        peer.on('connection', (conn) => {
+            dataConnection = conn;
+            setupDataConnection();
+        });
+
+        peer.on('error', (err) => {
+            console.error('PeerJS error:', err);
+            updateConnectionStatus('Connection error', 'disconnected');
+        });
+
+        peer.on('disconnected', () => {
+            updateConnectionStatus('Disconnected from server', 'disconnected');
+        });
+
+        // Connect button click handler
+        connectBtn.addEventListener('click', () => {
+            const remotePeerId = remotePeerIdInput.value.trim();
+            if (remotePeerId) {
+                updateConnectionStatus('Connecting...', 'connecting');
+                // Create data connection first
+                dataConnection = peer.connect(remotePeerId);
+                setupDataConnection();
+                // Then make the video call
+                makeCall(remotePeerId);
+            }
+        });
+
+        function setupDataConnection() {
+            dataConnection.on('open', () => {
+                console.log('Data connection established');
+            });
+
+            dataConnection.on('data', (data) => {
+                if (data.type === 'chat') {
+                    addMessage(data.message, false);
+                }
+            });
+
+            dataConnection.on('close', () => {
+                console.log('Data connection closed');
+            });
+
+            dataConnection.on('error', (err) => {
+                console.error('Data connection error:', err);
+            });
+        }
+
+        // Initialize media stream
+        async function initializeStream() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                localVideo.srcObject = localStream;
+                updateConnectionStatus('Ready for call', 'disconnected');
+                waitingScreen.style.display = 'none';
+            } catch (err) {
+                console.error('Failed to get media stream:', err);
+                updateConnectionStatus('Camera/Microphone access denied', 'disconnected');
+            }
+        }
+
+        // Handle incoming calls
+        peer.on('call', call => {
+            call.answer(localStream);
+            setupCallHandlers(call);
+        });
+
+        // Setup call handlers
+        function setupCallHandlers(call) {
+            currentCall = call;
+
+            call.on('stream', stream => {
+                remoteVideo.srcObject = stream;
+                remoteStream = stream;
+                updateConnectionStatus('Connected', 'connected');
+                waitingScreen.style.display = 'none';
+            });
+
+            call.on('close', () => {
+                remoteVideo.srcObject = null;
+                updateConnectionStatus('Call ended', 'disconnected');
+                if (remoteStream) {
+                    remoteStream.getTracks().forEach(track => track.stop());
+                }
+            });
+
+            call.on('error', err => {
+                console.error('Call error:', err);
+                updateConnectionStatus('Call error', 'disconnected');
+            });
+        }
+
+        // Make a call
+        function makeCall(remotePeerId) {
+            const call = peer.call(remotePeerId, localStream);
+            setupCallHandlers(call);
+        }
+
+        // End call
+        function endCall() {
+            if (currentCall) {
+                currentCall.close();
+                updateConnectionStatus('Call ended', 'disconnected');
+            }
+            if (dataConnection) {
+                dataConnection.close();
+            }
+        }
+
+        // Toggle audio
+        toggleAudioBtn.addEventListener('click', () => {
+            const audioTrack = localStream.getAudioTracks()[0];
+            audioTrack.enabled = !audioTrack.enabled;
+            toggleAudioBtn.innerHTML = audioTrack.enabled ? 
+                '<i class="fas fa-microphone"></i>' : 
+                '<i class="fas fa-microphone-slash"></i>';
+        });
+
+        // Toggle video
+        toggleVideoBtn.addEventListener('click', () => {
+            const videoTrack = localStream.getVideoTracks()[0];
+            videoTrack.enabled = !videoTrack.enabled;
+            toggleVideoBtn.innerHTML = videoTrack.enabled ? 
+                '<i class="fas fa-video"></i>' : 
+                '<i class="fas fa-video-slash"></i>';
+        });
+
+        // End call button handler
+        endCallBtn.addEventListener('click', endCall);
+
+        // Update connection status
+        function updateConnectionStatus(status, type = 'disconnected') {
+            statusText.textContent = status;
+            statusIndicator.className = 'status-indicator ' + type;
+        }
+
+        // Chat functionality
+        function addMessage(content, isSent) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+            messageDiv.textContent = content;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        sendMessageBtn.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message && dataConnection) {
+                // Send message through data connection
+                dataConnection.send({
+                    type: 'chat',
+                    message: message
+                });
+                addMessage(message, true);
+                chatInput.value = '';
+            }
+        });
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessageBtn.click();
+            }
+        });
+
+        // Toggle chat window
+        toggleChatBtn.addEventListener('click', () => {
+            const chatContainer = document.querySelector('.chat-container');
+            const isMinimized = chatContainer.style.height === '40px';
+            chatContainer.style.height = isMinimized ? '400px' : '40px';
+            toggleChatBtn.innerHTML = isMinimized ? 
+                '<i class="fas fa-minus"></i>' : 
+                '<i class="fas fa-plus"></i>';
+        });
+
+        // Initialize when page loads
+        window.onload = function() {
+            checkAuth();
+            initializeStream();
+        };
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            if (currentCall) {
+                currentCall.close();
+            }
+            if (dataConnection) {
+                dataConnection.close();
+            }
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            peer.destroy();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailMed - Offline Health Kit</title>
+    <link rel="icon" type="image/png" href="Screenshot 2025-02-28 111111.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #1B3E8C;
+            --secondary-blue: #5A9BD5;
+            --accent-red: #e63946;
+            --light-red: #ffd6d6;
+            --light-gray: #f5f5f5;
+            --success-green: #4CAF50;
+            --warning-orange: #FF9800;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: var(--light-gray);
+        }
+
+        header {
+            background: linear-gradient(to right, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: auto;
+        }
+
+        nav {
+            background: var(--secondary-blue);
+            padding: 1rem;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .offline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .offline-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .offline-card h2 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .offline-card h2 i {
+            color: var(--accent-red);
+        }
+
+        .download-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: var(--secondary-blue);
+            transform: translateY(-2px);
+        }
+
+        .resource-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .resource-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .resource-list li i {
+            color: var(--success-green);
+        }
+
+        .offline-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .status-downloaded {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .status-pending {
+            background: var(--warning-orange);
+            color: white;
+        }
+
+        #map-container {
+            height: 300px;
+            background: #eee;
+            margin-top: 1rem;
+            border-radius: 8px;
+        }
+
+        .translator-section {
+            margin-top: 1rem;
+        }
+
+        .phrase-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .phrase-item {
+            padding: 0.8rem;
+            background: var(--light-gray);
+            margin-bottom: 0.5rem;
+            border-radius: 5px;
+        }
+
+        .phrase-item strong {
+            color: var(--primary-blue);
+        }
+
+        .sync-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="Screenshot 2025-02-28 111111.png" alt="RailMed Logo" class="logo">
+            <h1>RailHealth Offline Kit</h1>
+        </div>
+        <div id="sync-time"></div>
+    </header>
+
+    <div class="container">
+        <div class="offline-grid">
+            <!-- First Aid Guide -->
+            <div class="offline-card">
+                <h2><i class="fas fa-kit-medical"></i> First Aid Guide</h2>
+                <div class="resource-list">
+                    <li><i class="fas fa-check"></i> Basic First Aid Procedures</li>
+                    <li><i class="fas fa-check"></i> Emergency Response Steps</li>
+                    <li><i class="fas fa-check"></i> Common Health Issues</li>
+                    <li><i class="fas fa-check"></i> Medication Guidelines</li>
+                </div>
+                <button class="download-btn" onclick="downloadResource('firstaid')">
+                    <i class="fas fa-download"></i> Download Guide
+                </button>
+            </div>
+
+            <!-- Symptom Checker -->
+            <div class="offline-card">
+                <h2><i class="fas fa-stethoscope"></i> Symptom Checker</h2>
+                <div class="resource-list">
+                    <li><i class="fas fa-check"></i> Symptom Database</li>
+                    <li><i class="fas fa-check"></i> Diagnostic Flowcharts</li>
+                    <li><i class="fas fa-check"></i> Emergency Indicators</li>
+                    <li><i class="fas fa-check"></i> Treatment Suggestions</li>
+                </div>
+                <button class="download-btn" onclick="downloadResource('symptoms')">
+                    <i class="fas fa-download"></i> Download Database
+                </button>
+            </div>
+
+            <!-- Medical Facilities Map -->
+            <div class="offline-card">
+                <h2><i class="fas fa-map-location-dot"></i> Medical Facilities</h2>
+                <div class="resource-list">
+                    <li><i class="fas fa-check"></i> Station Medical Centers</li>
+                    <li><i class="fas fa-check"></i> Nearby Hospitals</li>
+                    <li><i class="fas fa-check"></i> Emergency Contacts</li>
+                </div>
+                <button class="download-btn" onclick="downloadResource('facilities')">
+                    <i class="fas fa-download"></i> Download Map Data
+                </button>
+            </div>
+
+            <!-- Medical Translator -->
+            <div class="offline-card">
+                <h2><i class="fas fa-language"></i> Medical Translator</h2>
+                <div class="translator-section">
+                    <div class="phrase-list">
+                        <div class="phrase-item">
+                            <strong>I need medical help</strong>
+                            <div>मुझे चिकित्सा सहायता की आवश्यकता है</div>
+                        </div>
+                        <div class="phrase-item">
+                            <strong>Where is the nearest hospital?</strong>
+                            <div>नजदीकी अस्पताल कहाँ है?</div>
+                        </div>
+                        <div class="phrase-item">
+                            <strong>I have chest pain</strong>
+                            <div>मुझे छाती में दर्द है</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="download-btn" onclick="downloadResource('translator')">
+                    <i class="fas fa-download"></i> Download Translations
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sync-status">
+        <i class="fas fa-sync-alt"></i>
+        <span>Last synced: <span id="last-sync">Never</span></span>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Initialize the offline storage system
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => console.log('ServiceWorker registered'))
+                .catch(error => console.log('ServiceWorker registration failed:', error));
+        }
+
+        // Resource metadata
+        const resourceData = {
+            firstaid: {
+                name: 'First Aid Guide',
+                title: 'RailMed First Aid Guide',
+                content: [
+                    {
+                        heading: 'Basic First Aid Procedures',
+                        items: [
+                            {
+                                subtitle: 'CPR (Cardiopulmonary Resuscitation)',
+                                steps: [
+                                    'Check the scene for safety',
+                                    'Check for responsiveness by tapping and shouting',
+                                    'Call for emergency help and get an AED if available',
+                                    'Check breathing for no more than 10 seconds',
+                                    'Begin chest compressions: Push hard and fast in the center of the chest (at least 2 inches deep at a rate of 100-120 compressions per minute)',
+                                    'Give rescue breaths: Tilt head back, lift chin, pinch nose shut, and give 2 breaths, ensuring chest rises',
+                                    'Continue CPR (30 compressions, 2 breaths) until help arrives or the person shows signs of life'
+                                ]
+                            },
+                            {
+                                subtitle: 'Choking (Heimlich Maneuver)',
+                                steps: [
+                                    'Identify if the person can speak, cough, or breathe',
+                                    'If the person is choking and cannot breathe, stand behind them',
+                                    'Wrap your arms around their waist, make a fist, and place it just above the navel',
+                                    'Perform quick, inward, and upward thrusts until the object is expelled or the person becomes unconscious',
+                                    'If unconscious, begin CPR and call emergency services'
+                                ]
+                            },
+                            {
+                                subtitle: 'Bleeding',
+                                steps: [
+                                    'Wash hands and wear gloves if available',
+                                    'Apply direct pressure to the wound with a clean cloth',
+                                    'Elevate the injured area if possible',
+                                    'Apply a sterile bandage, keeping pressure on the wound',
+                                    'If bleeding does not stop, seek emergency medical assistance'
+                                ]
+                            },
+                            {
+                                subtitle: 'Burns',
+                                steps: [
+                                    'Remove the person from the heat source',
+                                    'Cool the burn with running cool water for at least 10 minutes',
+                                    'Do not apply ice or butter',
+                                    'Cover the burn with a sterile, non-stick bandage',
+                                    'For severe burns, seek emergency medical assistance immediately'
+                                ]
+                            },
+                            {
+                                subtitle: 'Fractures and Sprains',
+                                steps: [
+                                    'Keep the injured limb still and avoid movement',
+                                    'Apply a splint or support using soft padding if necessary',
+                                    'Apply an ice pack wrapped in a cloth to reduce swelling',
+                                    'Elevate the injured limb if possible',
+                                    'Seek medical attention immediately for fractures'
+                                ]
+                            },
+                            {
+                                subtitle: 'General Emergency Protocol',
+                                steps: [
+                                    'Assess the situation to ensure safety',
+                                    'Check for responsiveness and breathing',
+                                    'Call emergency services',
+                                    'Provide necessary first aid based on the condition',
+                                    'Monitor the person’s condition and stay with them until help arrives'
+                                ]
+                            },
+                            {
+                                subtitle: 'Shock Treatment',
+                                steps: [
+                                    'Lay the person down with legs elevated if no spinal injury is suspected',
+                                    'Keep them warm and comfortable',
+                                    'Loosen tight clothing',
+                                    'Reassure them and keep them calm',
+                                    'Seek emergency medical help immediately'
+                                ]
+                            },
+                            {
+                                subtitle: 'Poisoning',
+                                steps: [
+                                    'Identify the source of poisoning (chemical, food, gas, etc.)',
+                                    'Call emergency services and provide information on the poison',
+                                    'Do not induce vomiting unless instructed by medical personnel',
+                                    'If unconscious or having difficulty breathing, perform CPR if needed',
+                                    'Move the person to fresh air if poison is inhaled'
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            symptoms: {
+                name: 'Symptom Checker',
+                title: 'RailMed Symptom Guide',
+                content: [
+                    {
+                        heading: 'Common Emergency Symptoms',
+                        items: [
+                            {
+                                subtitle: 'Chest Pain',
+                                details: [
+                                    'Severity: Immediate medical attention needed',
+                                    'Actions: Stop activity, sit down, call emergency',
+                                    'Warning Signs: Sweating, nausea, shortness of breath',
+                                    'Note: Chest pain can indicate a heart attack. Seek help immediately.',
+                                    'Additional Info: Keep the person calm and monitor their condition until help arrives.'
+                                ]
+                            },
+                            {
+                                subtitle: 'Breathing Difficulty',
+                                details: [
+                                    'Severity: Urgent medical attention needed',
+                                    'Actions: Sit upright, loosen tight clothing',
+                                    'Warning Signs: Blue lips, extreme anxiety',
+                                    'Note: Breathing difficulty can be a sign of an asthma attack or allergic reaction.',
+                                    'Additional Info: If the person has an inhaler, assist them in using it.'
+                                ]
+                            },
+                            {
+                                subtitle: 'Severe Allergic Reaction',
+                                details: [
+                                    'Severity: Life-threatening emergency',
+                                    'Actions: Call emergency services immediately',
+                                    'Warning Signs: Swelling of the face, lips, or throat; difficulty breathing',
+                                    'Note: If the person has an epinephrine auto-injector (EpiPen), administer it if trained to do so.',
+                                    'Additional Info: Keep the person lying down and calm until help arrives.'
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            facilities: {
+                name: 'Medical Facilities Guide',
+                title: 'RailMed Facilities Directory',
+                content: [
+                    {
+                        heading: 'Emergency Contacts',
+                        items: [
+                            {
+                                subtitle: 'Railway Emergency',
+                                details: ['Toll Free: 138']
+                            },
+                            {
+                                subtitle: 'Medical Emergency',
+                                details: ['Ambulance: 108', 'Emergency: 112']
+                            }
+                        ]
+                    },
+                    {
+                        heading: 'Major Railway Hospitals',
+                        items: [
+                            {
+                                subtitle: 'Delhi Central Railway Hospital',
+                                details: [
+                                    'Contact: 011-23747100',
+                                    'Services: 24/7 Emergency, First Aid, Trauma Care',
+                                    'Additional Info: Located near the main railway station, easily accessible.'
+                                ]
+                            },
+                            {
+                                subtitle: 'Mumbai CSMT Medical Center',
+                                details: [
+                                    'Contact: 022-22621220',
+                                    'Services: Emergency Care, Pharmacy, General Medicine',
+                                    'Additional Info: Open 24 hours, equipped with a helipad for airlift emergencies.'
+                                ]
+                            },
+                            {
+                                subtitle: 'Kolkata Howrah Railway Hospital',
+                                details: [
+                                    'Contact: 033-2641-1234',
+                                    'Services: Emergency Services, Surgery, Pediatric Care',
+                                    'Additional Info: Specializes in pediatric emergencies and has a dedicated children’s ward.'
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            translator: {
+                name: 'Medical Phrases',
+                title: 'RailMed Medical Translator',
+                content: [
+                    {
+                        heading: 'Emergency Phrases',
+                        items: [
+                            {
+                                subtitle: 'Basic Emergency',
+                                translations: [
+                                    'English: I need medical help',
+                                    'हिंदी: मुझे चिकित्सा सहायता की आवश्यकता है',
+                                    'தமிழ்: எனக்கு மருத்துவ உதவி தேவை'
+                                ]
+                            },
+                            {
+                                subtitle: 'Pain Description',
+                                translations: [
+                                    'English: I have severe pain',
+                                    'हिंदी: मुझे बहुत दर्द है',
+                                    'தமிழ்: எனக்கு கடுமையான வலி உள்ளது'
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Generate PDF
+        function generatePDF(type) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const data = resourceData[type];
+            let yPos = 20;
+            
+            // Title
+            doc.setFontSize(20);
+            doc.text(data.title, 105, yPos, { align: 'center' });
+            yPos += 20;
+
+            // Content
+            data.content.forEach(section => {
+                // Section heading
+                doc.setFontSize(16);
+                doc.setTextColor(0, 62, 140); // RailMed blue
+                doc.text(section.heading, 20, yPos);
+                yPos += 10;
+
+                // Items
+                section.items.forEach(item => {
+                    // Check if we need a new page
+                    if (yPos > 250) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+
+                    // Subtitle
+                    doc.setFontSize(14);
+                    doc.setTextColor(230, 57, 70); // RailMed red
+                    doc.text(item.subtitle, 25, yPos);
+                    yPos += 10;
+
+                    // Details/Steps/Translations
+                    doc.setFontSize(12);
+                    doc.setTextColor(0, 0, 0);
+                    const details = item.steps || item.details || item.translations || [];
+                    details.forEach(detail => {
+                        // Check if we need a new page
+                        if (yPos > 280) {
+                            doc.addPage();
+                            yPos = 20;
+                        }
+                        doc.text('• ' + detail, 30, yPos);
+                        yPos += 7;
+                    });
+                    yPos += 5;
+                });
+                yPos += 10;
+            });
+
+            // Footer
+            doc.setFontSize(10);
+            doc.setTextColor(128, 128, 128);
+            doc.text('Generated by RailMed Offline Kit', 105, 290, { align: 'center' });
+            
+            // Save the PDF
+            doc.save(`railmed_${type}_guide.pdf`);
+        }
+
+        // Download resource function
+        async function downloadResource(type) {
+            const btn = document.querySelector(`[onclick="downloadResource('${type}')"]`);
+            
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+                
+                // Generate and download PDF
+                generatePDF(type);
+                
+                // Update UI
+                btn.innerHTML = '<i class="fas fa-download"></i> Download Again';
+                btn.disabled = false;
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Retry';
+                btn.disabled = false;
+            }
+        }
+
+        // Initialize when page loads
+        window.onload = function() {
+            document.getElementById('last-sync').textContent = new Date().toLocaleTimeString();
+        };
+    </script>
+</body>
+</html>

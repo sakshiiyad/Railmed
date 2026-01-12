@@ -1,0 +1,45 @@
+{
+    "version": "1.0",
+    "lastUpdated": "2025-03-22",
+    "symptoms": [
+        {
+            "id": "fever",
+            "name": "Fever",
+            "description": "Elevated body temperature",
+            "severity": {
+                "mild": "37.5-38.3°C",
+                "moderate": "38.4-39.4°C",
+                "severe": ">39.5°C"
+            },
+            "actions": [
+                "Rest",
+                "Stay hydrated",
+                "Take temperature regularly",
+                "Seek medical help if severe"
+            ]
+        },
+        {
+            "id": "chest_pain",
+            "name": "Chest Pain",
+            "description": "Pain or discomfort in chest",
+            "severity": {
+                "mild": "Brief, localized pain",
+                "moderate": "Persistent discomfort",
+                "severe": "Intense pain with other symptoms"
+            },
+            "actions": [
+                "Stop physical activity",
+                "Sit or lie down",
+                "Seek immediate medical attention",
+                "Take prescribed medication if available"
+            ]
+        }
+    ],
+    "emergencyIndicators": [
+        "Severe chest pain",
+        "Difficulty breathing",
+        "Loss of consciousness",
+        "Severe bleeding",
+        "Stroke symptoms"
+    ]
+}

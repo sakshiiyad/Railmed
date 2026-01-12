@@ -1,0 +1,100 @@
+{
+    "title": "First Aid Guide",
+    "version": "2.0",
+    "lastUpdated": "2025-03-22",
+    "sections": [
+        {
+            "title": "Basic First Aid Procedures",
+            "content": [
+                {
+                    "title": "CPR (Cardiopulmonary Resuscitation)",
+                    "steps": [
+                        "Check the scene for safety",
+                        "Check for responsiveness by tapping and shouting",
+                        "Call for emergency help and get an AED if available",
+                        "Check breathing for no more than 10 seconds",
+                        "Begin chest compressions: Push hard and fast in the center of the chest (at least 2 inches deep at a rate of 100-120 compressions per minute)",
+                        "Give rescue breaths: Tilt head back, lift chin, pinch nose shut, and give 2 breaths, ensuring chest rises",
+                        "Continue CPR (30 compressions, 2 breaths) until help arrives or the person shows signs of life"
+                    ]
+                },
+                {
+                    "title": "Choking (Heimlich Maneuver)",
+                    "steps": [
+                        "Identify if the person can speak, cough, or breathe",
+                        "If the person is choking and cannot breathe, stand behind them",
+                        "Wrap your arms around their waist, make a fist, and place it just above the navel",
+                        "Perform quick, inward, and upward thrusts until the object is expelled or the person becomes unconscious",
+                        "If unconscious, begin CPR and call emergency services"
+                    ]
+                },
+                {
+                    "title": "Bleeding",
+                    "steps": [
+                        "Wash hands and wear gloves if available",
+                        "Apply direct pressure to the wound with a clean cloth",
+                        "Elevate the injured area if possible",
+                        "Apply a sterile bandage, keeping pressure on the wound",
+                        "If bleeding does not stop, seek emergency medical assistance"
+                    ]
+                },
+                {
+                    "title": "Burns",
+                    "steps": [
+                        "Remove the person from the heat source",
+                        "Cool the burn with running cool water for at least 10 minutes",
+                        "Do not apply ice or butter",
+                        "Cover the burn with a sterile, non-stick bandage",
+                        "For severe burns, seek emergency medical assistance immediately"
+                    ]
+                },
+                {
+                    "title": "Fractures and Sprains",
+                    "steps": [
+                        "Keep the injured limb still and avoid movement",
+                        "Apply a splint or support using soft padding if necessary",
+                        "Apply an ice pack wrapped in a cloth to reduce swelling",
+                        "Elevate the injured limb if possible",
+                        "Seek medical attention immediately for fractures"
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Emergency Response Steps",
+            "content": [
+                {
+                    "title": "General Emergency Protocol",
+                    "steps": [
+                        "Assess the situation to ensure safety",
+                        "Check for responsiveness and breathing",
+                        "Call emergency services",
+                        "Provide necessary first aid based on the condition",
+                        "Monitor the person's condition and stay with them until help arrives"
+                    ]
+                },
+                {
+                    "title": "Shock Treatment",
+                    "steps": [
+                        "Lay the person down with legs elevated if no spinal injury is suspected",
+                        "Keep them warm and comfortable",
+                        "Loosen tight clothing",
+                        "Reassure them and keep them calm",
+                        "Seek emergency medical help immediately"
+                    ]
+                },
+                {
+                    "title": "Poisoning",
+                    "steps": [
+                        "Identify the source of poisoning (chemical, food, gas, etc.)",
+                        "Call emergency services and provide information on the poison",
+                        "Do not induce vomiting unless instructed by medical personnel",
+                        "If unconscious or having difficulty breathing, perform CPR if needed",
+                        "Move the person to fresh air if poison is inhaled"
+                    ]
+                }
+            ]
+        }
+    ]
+}
+

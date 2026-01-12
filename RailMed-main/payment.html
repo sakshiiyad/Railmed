@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="Screenshot 2025-02-28 111111.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailMed - Payment</title>
+    <style>
+        :root {
+            --primary-blue: #1B3E8C;
+            --secondary-blue: #5A9BD5;
+            --accent-red: #e63946;
+            --light-gray: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        .payment-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .payment-details {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-btn {
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .payment-btn:hover {
+            background: var(--primary-blue);
+        }
+
+        .payment-success {
+            background: #e8f5e9;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="payment-header">
+            <h2>Complete Your Payment</h2>
+            <p>Secure and easy payment process</p>
+        </div>
+
+        <div class="payment-details" id="payment-details">
+            <!-- Payment details will be loaded here -->
+        </div>
+
+        <button class="payment-btn" onclick="initiateUPIPayment()">Pay Now</button>
+        <div id="payment-fallback" style="margin-top: 20px;"></div>
+        <div class="payment-success" id="payment-success">
+            Payment successful! Thank you for using RailMed.
+        </div>
+    </div>
+
+    <script>
+        // Get payment details from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const amount = urlParams.get('amount') || 200;
+        const item = urlParams.get('item') || 'Medical Services';
+
+        // Display payment details
+        const paymentDetails = document.getElementById('payment-details');
+        paymentDetails.innerHTML = `
+            <p><strong>Item:</strong> ${item}</p>
+            <p><strong>Amount:</strong> ₹${amount}</p>
+        `;
+
+        function initiateUPIPayment() {
+            const upiId = '6361789776@ybl';
+            const name = 'RailMed';
+            const note = `Payment for ${item}`;
+            
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}&tn=${encodeURIComponent(note)}`;
+                const newWindow = window.open(upiLink, '_blank');
+                
+                setTimeout(() => {
+                    if (!newWindow || newWindow.closed || newWindow.closed === undefined) {
+                        showQRCodeFallback(upiId, name, amount, note);
+                    }
+                }, 500);
+            } else {
+                showQRCodeFallback(upiId, name, amount, note);
+            }
+        }
+
+        function showQRCodeFallback(upiId, name, amount, note) {
+            const qrCodeURL = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + 
+                encodeURIComponent(`upi://pay?pa=${upiId}&pn=${name}&am=${amount}&tn=${note}`);
+            
+            const fallbackHTML = `
+                <div style="text-align: center; margin-top: 20px;">
+                    <p>Please scan this QR code using your mobile UPI app:</p>
+                    <img src="${qrCodeURL}" alt="UPI QR Code" style="width: 200px; height: 200px;">
+                    <p>Or manually enter these details in your UPI app:</p>
+                    <div style="background: #f5f5f5; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        <p><strong>UPI ID:</strong> ${upiId}</p>
+                        <p><strong>Amount:</strong> ₹${amount}</p>
+                        <p><strong>Note:</strong> ${note}</p>
+                    </div>
+                </div>`;
+            
+            document.getElementById('payment-fallback').innerHTML = fallbackHTML;
+        }
+
+        // Add this function to handle successful payment
+        function handlePaymentSuccess() {
+            const successDiv = document.getElementById('payment-success');
+            successDiv.style.display = 'block';
+
+            // Send a message back to the parent window
+            window.opener.postMessage('paymentSuccess', window.location.origin);
+        }
+
+        // Update the payment button to call handlePaymentSuccess
+        document.querySelector('.payment-btn').addEventListener('click', () => {
+            // Simulate a successful payment (replace this with actual payment logic)
+            setTimeout(() => {
+                handlePaymentSuccess();
+            }, 2000); // Simulate a 2-second delay for payment processing
+        });
+    </script>
+</body>
+</html> 

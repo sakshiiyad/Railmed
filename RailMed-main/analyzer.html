@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailMed AI Symptom Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="Screenshot 2025-02-28 111111.png">
+    <style>
+        :root {
+            --primary-blue: #3498db;
+            --secondary-blue: #2980b9;
+            --accent-red: #e74c3c;
+            --light-red: #ffebee;
+            --success-green: #2ecc71;
+            --warning-yellow: #f1c40f;
+            --danger-red: #c0392b;
+            --primary-blue-old: #1B3E8C;
+            --secondary-blue-old: #5A9BD5;
+            --accent-red-old: #e63946;
+            --light-red-old: #ffd6d6;
+            --light-gray: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f6fa;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, #1B3E8C 0%, #5A9BD5 100%);
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-logo img {
+            height: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-top: 80px; /* Account for fixed navbar */
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .analyzer-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .analyzer-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .analyzer-header h1 {
+            color: var(--primary-blue-old);
+            margin-bottom: 0.5rem;
+        }
+
+        .analyzer-header p {
+            color: #666;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .mic-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .mic-btn:hover {
+            background: #2980b9;
+        }
+
+        .mic-btn.recording {
+            background: #e74c3c;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        #recordingStatus {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+
+        .analyze-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .analyze-btn:hover {
+            background: #27ae60;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #resultBox {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        #resultBox.visible {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #severityText {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .severity-mild {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .severity-moderate {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .severity-severe {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        #analysisText {
+            white-space: pre-line;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        #recommendations {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #recommendations li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        #recommendations li:before {
+            content: '•';
+            color: #3498db;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        #emergencyAlert {
+            display: none;
+            background: #c0392b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: shake 0.5s;
+        }
+
+        #emergencyAlert.visible {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        #historyList {
+            margin-top: 30px;
+        }
+
+        .history-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .history-item strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .history-item p {
+            margin: 0;
+            color: #666;
+        }
+
+        .severity-dot {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .severity-dot.severity-mild {
+            background: #2ecc71;
+        }
+
+        .severity-dot.severity-moderate {
+            background: #f39c12;
+        }
+
+        .severity-dot.severity-severe {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="Screenshot 2025-02-28 111111.png" alt="RailMed Logo">
+                RAILMED ANALYZER
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="telemedicine.html" class="nav-link">Telemedicine</a>
+                <a href="analyzer.html" class="nav-link active">AI Analyzer</a>
+                <a href="railhealth_offline.html" class="nav-link">Offline Mode</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <div class="analyzer-box">
+                <div class="analyzer-header">
+                    <h1>RailMed AI Symptom Analyzer</h1>
+                    <p>Describe your symptoms in detail for accurate analysis</p>
+                </div>
+
+                <div class="input-group">
+                    <textarea id="symptoms" placeholder="Example: I've been experiencing severe headache for the past 2 days, along with fever and body aches..."></textarea>
+                    <button class="mic-btn" id="micButton">
+                        <i class="fas fa-microphone" id="micIcon"></i>
+                    </button>
+                    <p id="recordingStatus"></p>
+                </div>
+
+                <button class="analyze-btn" id="analyzeBtn">
+                    <i class="fas fa-stethoscope"></i> Analyze Symptoms
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing your symptoms...</p>
+                </div>
+
+                <div class="result-box" id="resultBox">
+                    <h3>Analysis Results</h3>
+                    <div class="severity-indicator">
+                        <div class="severity-dot" id="severityDot"></div>
+                        <span id="severityText"></span>
+                    </div>
+                    <p id="analysis"></p>
+                    <div class="recommendations" id="recommendations"></div>
+                </div>
+
+                <div class="emergency-alert" id="emergencyAlert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Emergency Alert:</strong>
+                    <p>Your symptoms suggest immediate medical attention may be required. Please contact emergency services or visit the nearest hospital.</p>
+                    <p>Emergency Helpline: <strong>1800-1000-200</strong></p>
+                </div>
+
+                <div class="history-box">
+                    <h3>Recent Analyses</h3>
+                    <div id="historyList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Medical knowledge base
+        const medicalKnowledge = {
+            symptoms: {
+                headache: {
+                    related: ['migraine', 'tension', 'cluster', 'head pain', 'throbbing', 'pounding'],
+                    severity: {
+                        mild: { score: 2, duration: '< 24 hours', description: 'Mild discomfort, can perform daily activities' },
+                        moderate: { score: 5, duration: '1-3 days', description: 'Interferes with daily activities' },
+                        severe: { score: 8, duration: '> 3 days', description: 'Debilitating pain, unable to function normally' }
+                    },
+                    prevention: [
+                        'Stay hydrated by drinking plenty of water',
+                        'Maintain regular sleep schedule',
+                        'Practice stress management techniques',
+                        'Avoid known triggers (certain foods, bright lights, etc.)',
+                        'Take regular breaks when working on screens'
+                    ]
+                },
+                fever: {
+                    related: ['high temperature', 'chills', 'sweating', 'hot', 'feverish', 'burning up'],
+                    severity: {
+                        mild: { score: 3, threshold: '< 38°C', description: 'Slight elevation in temperature' },
+                        moderate: { score: 6, threshold: '38-39°C', description: 'Significant fever with chills' },
+                        severe: { score: 9, threshold: '> 39°C', description: 'High fever with severe symptoms' }
+                    },
+                    prevention: [
+                        'Wash hands frequently',
+                        'Avoid close contact with sick individuals',
+                        'Stay up to date with vaccinations',
+                        'Maintain a healthy immune system with proper nutrition',
+                        'Get adequate rest and sleep'
+                    ]
+                },
+                cough: {
+                    related: ['dry cough', 'wet cough', 'persistent', 'hacking', 'wheezing', 'bronchial'],
+                    severity: {
+                        mild: { score: 2, duration: '< 1 week', description: 'Occasional coughing' },
+                        moderate: { score: 5, duration: '1-2 weeks', description: 'Frequent coughing fits' },
+                        severe: { score: 7, duration: '> 2 weeks', description: 'Continuous coughing affecting breathing' }
+                    },
+                    prevention: [
+                        'Avoid smoking and secondhand smoke',
+                        'Use a humidifier in dry environments',
+                        'Stay hydrated to keep throat moist',
+                        'Avoid irritants like dust and strong chemicals',
+                        'Practice good respiratory hygiene (cover coughs)'
+                    ]
+                },
+                breathing: {
+                    related: ['shortness of breath', 'difficulty breathing', 'wheezing', 'breathless', 'gasping', 'labored breathing'],
+                    severity: {
+                        mild: { score: 4, description: 'Shortness of breath on exertion' },
+                        moderate: { score: 7, description: 'Shortness of breath at rest' },
+                        severe: { score: 10, description: 'Severe breathing difficulty, requiring immediate attention' }
+                    },
+                    prevention: [
+                        'Avoid exposure to air pollutants and allergens',
+                        'Practice breathing exercises regularly',
+                        'Maintain a healthy weight',
+                        'Avoid smoking and secondhand smoke',
+                        'Manage underlying conditions like asthma or COPD'
+                    ]
+                },
+                chest_pain: {
+                    related: ['chest tightness', 'pressure', 'angina', 'heart pain', 'chest discomfort'],
+                    severity: {
+                        mild: { score: 5, duration: 'intermittent', description: 'Brief episodes of chest discomfort' },
+                        moderate: { score: 8, duration: 'persistent', description: 'Ongoing chest pain or pressure' },
+                        severe: { score: 10, duration: 'severe/crushing', description: 'Intense chest pain, possible heart attack' }
+                    },
+                    prevention: [
+                        'Maintain a heart-healthy diet low in saturated fats',
+                        'Exercise regularly as recommended by your doctor',
+                        'Manage stress through relaxation techniques',
+                        'Avoid smoking and limit alcohol consumption',
+                        'Monitor and control blood pressure and cholesterol'
+                    ]
+                },
+                fatigue: {
+                    related: ['tiredness', 'exhaustion', 'weakness', 'lethargy', 'no energy'],
+                    severity: {
+                        mild: { score: 2, description: 'Feeling tired but can function' },
+                        moderate: { score: 4, description: 'Significant tiredness affecting daily activities' },
+                        severe: { score: 6, description: 'Extreme exhaustion, unable to perform tasks' }
+                    },
+                    prevention: [
+                        'Maintain a regular sleep schedule',
+                        'Stay physically active with moderate exercise',
+                        'Eat a balanced diet with proper nutrients',
+                        'Manage stress through relaxation techniques',
+                        'Stay hydrated throughout the day'
+                    ]
+                },
+                nausea: {
+                    related: ['vomiting', 'sick feeling', 'queasy', 'stomach upset'],
+                    severity: {
+                        mild: { score: 3, description: 'Mild nausea without vomiting' },
+                        moderate: { score: 5, description: 'Nausea with occasional vomiting' },
+                        severe: { score: 8, description: 'Severe nausea with frequent vomiting' }
+                    },
+                    prevention: [
+                        'Eat smaller, more frequent meals',
+                        'Avoid strong odors and triggering foods',
+                        'Stay hydrated with clear fluids',
+                        'Avoid lying down immediately after eating',
+                        'Practice deep breathing when feeling queasy'
+                    ]
+                },
+                dizziness: {
+                    related: ['vertigo', 'lightheaded', 'faint', 'unsteady', 'balance problems'],
+                    severity: {
+                        mild: { score: 3, description: 'Slight dizziness, passes quickly' },
+                        moderate: { score: 6, description: 'Persistent dizziness affecting movement' },
+                        severe: { score: 8, description: 'Severe vertigo, unable to stand' }
+                    },
+                    prevention: [
+                        'Change positions slowly, especially when getting up',
+                        'Stay hydrated throughout the day',
+                        'Avoid caffeine and alcohol',
+                        'Practice balance exercises if recommended by doctor',
+                        'Ensure adequate intake of iron and vitamin B12'
+                    ]
+                }
+            },
+            emergencyKeywords: [
+                'severe chest pain',
+                'difficulty breathing',
+                'unconscious',
+                'severe bleeding',
+                'stroke symptoms',
+                'heart attack',
+                'seizure',
+                'severe allergic reaction',
+                'anaphylaxis',
+                'severe head injury',
+                'cannot breathe',
+                'paralysis',
+                'severe burn',
+                'poisoning',
+                'overdose',
+                'suicidal thoughts',
+                'coughing blood',
+                'severe abdominal pain',
+                'head trauma',
+                'loss of vision'
+            ],
+            commonConditions: {
+                migraine: {
+                    symptoms: ['headache', 'nausea', 'light sensitivity', 'sound sensitivity', 'visual aura'],
+                    recommendations: [
+                        'Rest in a quiet, dark room',
+                        'Stay hydrated',
+                        'Consider over-the-counter pain relievers',
+                        'Apply cold or warm compress',
+                        'Practice relaxation techniques'
+                    ]
+                },
+                flu: {
+                    symptoms: ['fever', 'body aches', 'fatigue', 'cough', 'sore throat', 'headache'],
+                    recommendations: [
+                        'Get plenty of rest',
+                        'Stay hydrated with water and clear fluids',
+                        'Monitor temperature regularly',
+                        'Consider antiviral medication if within 48 hours',
+                        'Use over-the-counter fever reducers if needed',
+                        'Isolate to prevent spread'
+                    ]
+                },
+                covid19: {
+                    symptoms: ['fever', 'cough', 'loss of taste', 'loss of smell', 'fatigue', 'body aches'],
+                    recommendations: [
+                        'Isolate immediately',
+                        'Get tested for COVID-19',
+                        'Monitor oxygen levels with pulse oximeter',
+                        'Contact healthcare provider',
+                        'Monitor symptoms closely',
+                        'Stay hydrated and rest'
+                    ]
+                },
+                anxiety: {
+                    symptoms: ['rapid heartbeat', 'sweating', 'trembling', 'chest tightness', 'breathing fast'],
+                    recommendations: [
+                        'Practice deep breathing exercises',
+                        'Try grounding techniques',
+                        'Consider meditation or mindfulness',
+                        'Remove yourself from stressful situations if possible',
+                        'Contact a mental health professional'
+                    ]
+                },
+                gastroenteritis: {
+                    symptoms: ['nausea', 'vomiting', 'diarrhea', 'stomach pain', 'fever'],
+                    recommendations: [
+                        'Stay hydrated with clear fluids',
+                        'Try the BRAT diet (Bananas, Rice, Applesauce, Toast)',
+                        'Rest your stomach - avoid solid foods initially',
+                        'Avoid dairy and fatty foods',
+                        'Seek medical attention if symptoms persist'
+                    ]
+                }
+            },
+            riskFactors: {
+                age: {
+                    child: { multiplier: 1.2, description: 'Children may need special attention' },
+                    elderly: { multiplier: 1.3, description: 'Elderly patients may have complications' }
+                },
+                preExisting: {
+                    diabetes: { multiplier: 1.2 },
+                    heartDisease: { multiplier: 1.3 },
+                    immunocompromised: { multiplier: 1.4 }
+                },
+                lifestyle: {
+                    smoking: { multiplier: 1.1 },
+                    obesity: { multiplier: 1.2 }
+                }
+            }
+        };
+
+        // Initialize variables
+        let recognition = null;
+        let isRecording = false;
+
+        function setupVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = () => {
+                    isRecording = true;
+                    document.getElementById('micButton').classList.add('recording');
+                    document.getElementById('micIcon').textContent = 'mic';
+                    document.getElementById('recordingStatus').textContent = 'Listening...';
+                };
+
+                recognition.onend = () => {
+                    isRecording = false;
+                    document.getElementById('micButton').classList.remove('recording');
+                    document.getElementById('micIcon').textContent = 'mic_off';
+                    document.getElementById('recordingStatus').textContent = '';
+                };
+
+                recognition.onresult = (event) => {
+                    let finalTranscript = '';
+                    let interimTranscript = '';
+
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+
+                    const symptomsInput = document.getElementById('symptoms');
+                    if (finalTranscript) {
+                        // Clean up transcription
+                        finalTranscript = finalTranscript
+                            .replace(/\s+/g, ' ')
+                            .trim();
+                        
+                        // Append to existing text with proper spacing
+                        if (symptomsInput.value) {
+                            symptomsInput.value += ' ' + finalTranscript;
+                        } else {
+                            symptomsInput.value = finalTranscript;
+                        }
+                    }
+                    
+                    // Show interim results
+                    if (interimTranscript) {
+                        document.getElementById('recordingStatus').textContent = 
+                            'Heard: ' + interimTranscript;
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    if (event.error === 'no-speech') {
+                        document.getElementById('recordingStatus').textContent = 
+                            'No speech detected. Try again.';
+                    } else if (event.error === 'audio-capture') {
+                        document.getElementById('recordingStatus').textContent = 
+                            'No microphone detected.';
+                    } else if (event.error === 'not-allowed') {
+                        document.getElementById('recordingStatus').textContent = 
+                            'Microphone access denied.';
+                    } else {
+                        document.getElementById('recordingStatus').textContent = 
+                            'Error: ' + event.error;
+                    }
+                    stopRecording();
+                };
+            } else {
+                document.getElementById('micButton').style.display = 'none';
+                document.getElementById('recordingStatus').textContent = 
+                    'Voice input not supported in this browser.';
+            }
+        }
+
+        function toggleRecording() {
+            if (!recognition) {
+                setupVoiceRecognition();
+            }
+
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        function startRecording() {
+            if (recognition) {
+                recognition.start();
+            }
+        }
+
+        function stopRecording() {
+            if (recognition) {
+                recognition.stop();
+            }
+        }
+
+        // Initialize voice recognition on page load
+        window.addEventListener('load', setupVoiceRecognition);
+
+        // Event Listeners
+        document.getElementById('micButton').addEventListener('click', toggleRecording);
+        document.getElementById('analyzeBtn').addEventListener('click', analyzeSymptoms);
+
+        function analyzeSymptoms() {
+            const symptoms = document.getElementById('symptoms').value;
+            const loading = document.getElementById('loading');
+            const resultBox = document.getElementById('resultBox');
+            const emergencyAlert = document.getElementById('emergencyAlert');
+
+            if (!symptoms) {
+                alert('Please describe your symptoms first.');
+                return;
+            }
+
+            // Show loading
+            loading.classList.add('visible');
+            resultBox.classList.remove('visible');
+            emergencyAlert.classList.remove('visible');
+
+            // Simulate processing time
+            setTimeout(() => {
+                const analysis = performAnalysis(symptoms);
+                displayResults(analysis);
+                saveToHistory(symptoms, analysis);
+                loading.classList.remove('visible');
+            }, 1500);
+        }
+
+        function performAnalysis(text) {
+            const symptoms = [];
+            const detectedConditions = [];
+            let totalSeverity = 0;
+            let emergencyDetected = false;
+            
+            // Clean and normalize input text
+            const normalizedText = text.toLowerCase().trim();
+            const words = normalizedText.split(/\s+/);
+            
+            // Check for emergency conditions first
+            emergencyDetected = medicalKnowledge.emergencyKeywords.some(keyword => 
+                normalizedText.includes(keyword.toLowerCase())
+            );
+
+            if (emergencyDetected) {
+                return {
+                    severity: 10,
+                    severityLevel: 'severe',
+                    emergency: true,
+                    message: 'EMERGENCY: Seek immediate medical attention!',
+                    detectedSymptoms: [],
+                    recommendations: ['Call emergency services immediately', 'Do not delay seeking help']
+                };
+            }
+
+            // Detect symptoms using enhanced pattern matching
+            for (const [symptomName, symptomData] of Object.entries(medicalKnowledge.symptoms)) {
+                // Check main symptom name
+                if (normalizedText.includes(symptomName)) {
+                    symptoms.push({ name: symptomName, data: symptomData });
+                    continue;
+                }
+                
+                // Check related terms
+                const found = symptomData.related.some(term => {
+                    // Check for exact match
+                    if (normalizedText.includes(term)) return true;
+                    
+                    // Check for word boundary matches to avoid partial word matches
+                    const regex = new RegExp(`\\b${term}\\b`, 'i');
+                    return regex.test(normalizedText);
+                });
+                
+                if (found) {
+                    symptoms.push({ name: symptomName, data: symptomData });
+                }
+            }
+
+            // Analyze severity for each symptom
+            const detectedSymptoms = symptoms.map(symptom => {
+                let severity = 'mild';
+                let severityScore = symptom.data.severity.mild.score;
+                
+                // Check for severity indicators in text
+                if (normalizedText.includes('severe') || normalizedText.includes('intense') || 
+                    normalizedText.includes('extreme') || normalizedText.includes('worst')) {
+                    severity = 'severe';
+                    severityScore = symptom.data.severity.severe.score;
+                } else if (normalizedText.includes('moderate') || normalizedText.includes('significant') || 
+                         normalizedText.includes('medium')) {
+                    severity = 'moderate';
+                    severityScore = symptom.data.severity.moderate.score;
+                }
+
+                totalSeverity += severityScore;
+                
+                return {
+                    name: symptom.name,
+                    severity: severity,
+                    score: severityScore,
+                    description: symptom.data.severity[severity].description || ''
+                };
+            });
+
+            // Check for common conditions
+            for (const [condition, data] of Object.entries(medicalKnowledge.commonConditions)) {
+                const matchedSymptoms = data.symptoms.filter(s => 
+                    normalizedText.includes(s.toLowerCase())
+                );
+                
+                if (matchedSymptoms.length >= Math.ceil(data.symptoms.length * 0.6)) {
+                    detectedConditions.push({
+                        name: condition,
+                        matchedSymptoms: matchedSymptoms,
+                        recommendations: data.recommendations
+                    });
+                }
+            }
+
+            // Calculate overall severity
+            const averageSeverity = detectedSymptoms.length ? 
+                totalSeverity / detectedSymptoms.length : 0;
+            
+            let severityLevel = 'mild';
+            if (averageSeverity >= 7) severityLevel = 'severe';
+            else if (averageSeverity >= 4) severityLevel = 'moderate';
+
+            // Generate recommendations
+            let recommendations = ['Monitor your symptoms'];
+            if (detectedConditions.length > 0) {
+                recommendations = detectedConditions[0].recommendations;
+            }
+            
+            if (severityLevel === 'severe') {
+                recommendations.unshift('Consider seeking immediate medical attention');
+            } else if (severityLevel === 'moderate') {
+                recommendations.unshift('Consider consulting a healthcare provider');
+            }
+
+            return {
+                severity: averageSeverity,
+                severityLevel: severityLevel,
+                emergency: false,
+                detectedSymptoms: detectedSymptoms,
+                possibleConditions: detectedConditions,
+                recommendations: recommendations
+            };
+        }
+
+        function displayResults(analysis) {
+            const resultBox = document.getElementById('resultBox');
+            const severityDot = document.getElementById('severityDot');
+            const severityText = document.getElementById('severityText');
+            const analysisText = document.getElementById('analysis');
+            const recommendationsDiv = document.getElementById('recommendations');
+            const emergencyAlert = document.getElementById('emergencyAlert');
+
+            // Update severity indicator
+            severityDot.className = 'severity-dot severity-' + analysis.severityLevel;
+            severityText.textContent = `Severity Level: ${analysis.severityLevel.toUpperCase()}`;
+
+            // Display analysis
+            let analysisContent = '';
+            if (analysis.detectedSymptoms.length > 0) {
+                analysisContent += `Detected symptoms: ${analysis.detectedSymptoms.map(s => s.name).join(', ')}\n\n`;
+            }
+            if (analysis.possibleConditions.length > 0) {
+                analysisContent += `Possible conditions: ${analysis.possibleConditions.map(c => c.name).join(', ')}\n\n`;
+            }
+            analysisText.textContent = analysisContent;
+
+            // Display recommendations
+            recommendationsDiv.innerHTML = '<h4>Recommendations:</h4>';
+            
+            // Add general recommendations
+            const generalRecsDiv = document.createElement('div');
+            generalRecsDiv.className = 'recommendation-section';
+            generalRecsDiv.innerHTML = '<h5>General Recommendations:</h5>';
+            
+            analysis.recommendations.forEach(rec => {
+                const recItem = document.createElement('div');
+                recItem.className = 'recommendation-item';
+                recItem.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <span>${rec}</span>
+                `;
+                generalRecsDiv.appendChild(recItem);
+            });
+            
+            recommendationsDiv.appendChild(generalRecsDiv);
+            
+            // Add prevention recommendations for specific symptoms
+            if (analysis.detectedSymptoms.length > 0) {
+                const preventionDiv = document.createElement('div');
+                preventionDiv.className = 'recommendation-section';
+                preventionDiv.innerHTML = '<h5>Prevention Tips:</h5>';
+                
+                // Get unique prevention tips for detected symptoms
+                const allPreventionTips = new Set();
+                
+                analysis.detectedSymptoms.forEach(symptom => {
+                    const symptomData = medicalKnowledge.symptoms[symptom.name];
+                    if (symptomData && symptomData.prevention) {
+                        symptomData.prevention.forEach(tip => allPreventionTips.add(tip));
+                    }
+                });
+                
+                // Display prevention tips
+                if (allPreventionTips.size > 0) {
+                    Array.from(allPreventionTips).forEach(tip => {
+                        const tipItem = document.createElement('div');
+                        tipItem.className = 'recommendation-item';
+                        tipItem.innerHTML = `
+                            <i class="fas fa-shield-alt"></i>
+                            <span>${tip}</span>
+                        `;
+                        preventionDiv.appendChild(tipItem);
+                    });
+                    
+                    recommendationsDiv.appendChild(preventionDiv);
+                }
+            }
+
+            // Show emergency alert if needed
+            if (analysis.emergency) {
+                emergencyAlert.classList.add('visible');
+                emergencyAlert.querySelector('p').textContent = analysis.message;
+            }
+
+            resultBox.classList.add('visible');
+        }
+
+        function saveToHistory(symptoms, analysis) {
+            const historyList = document.getElementById('historyList');
+            const timestamp = new Date().toLocaleString();
+
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <strong>${timestamp}</strong>
+                <p>${symptoms.substring(0, 100)}${symptoms.length > 100 ? '...' : ''}</p>
+                <span class="severity-dot severity-${analysis.severityLevel}"></span>
+            `;
+
+            historyList.insertBefore(historyItem, historyList.firstChild);
+
+            // Keep only last 5 items
+            while (historyList.children.length > 5) {
+                historyList.removeChild(historyList.lastChild);
+            }
+
+            // Save to localStorage
+            const history = JSON.parse(localStorage.getItem('symptomHistory') || '[]');
+            history.unshift({ timestamp, symptoms, analysis });
+            if (history.length > 5) history.pop();
+            localStorage.setItem('symptomHistory', JSON.stringify(history));
+        }
+
+        // Load history on page load
+        window.onload = function() {
+            const history = JSON.parse(localStorage.getItem('symptomHistory') || '[]');
+            const historyList = document.getElementById('historyList');
+
+            history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <strong>${item.timestamp}</strong>
+                    <p>${item.symptoms.substring(0, 100)}${item.symptoms.length > 100 ? '...' : ''}</p>
+                    <span class="severity-dot severity-${item.analysis.severityLevel}"></span>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        };
+    </script>
+</body>
+</html>

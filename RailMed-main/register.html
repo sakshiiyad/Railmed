@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="Screenshot 2025-02-28 111111.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailMed - Service Registration</title>
+    <style>
+        :root {
+            --primary-blue: #1B3E8C;
+            --secondary-blue: #5A9BD5;
+            --accent-red: #e63946;
+            --light-red: #ffd6d6;
+            --light-gray: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background: linear-gradient(to right, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            transition: transform 0.3s ease;
+        }
+
+        nav {
+            background-color: var(--secondary-blue);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 2rem;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .registration-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 5px rgba(90, 155, 213, 0.3);
+        }
+
+        button {
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        button:hover {
+            background: var(--primary-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .success-message {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .success-message #registration-id {
+            font-size: 1.2em;
+            color: #ffeb3b;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .error-message {
+            background-color: var(--accent-red);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .status-message {
+            margin-top: 20px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .form-group.inline {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-group.inline {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        footer {
+            background: linear-gradient(to right, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="Screenshot 2025-02-28 111111.png" alt="RailMed Logo" class="logo">
+        <h1>RailMed</h1>
+    </header>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="index.html#services">Services</a>
+        <a href="analyzer.html">Health Analyzer</a>
+        <a href="railhealth_offline.html">RailHealth Offline</a>
+    </nav>
+
+    <div class="container">
+        <div class="registration-form">
+            <h2>Register for RailMed Services</h2>
+            <p>Please enter your details to access medical services during your journey.</p>
+            
+            <form id="registrationForm" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pnr">PNR Number</label>
+                    <input type="text" id="pnr" name="pnr" required pattern="[0-9]{10}" title="Please enter a valid 10-digit PNR number">
+                </div>
+
+                <div class="form-group inline">
+                    <div>
+                        <label for="age">Age</label>
+                        <input type="number" id="age" name="age" required min="1" max="120">
+                    </div>
+                    <div>
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="medical-conditions">Medical Conditions (if any)</label>
+                    <textarea id="medical-conditions" name="medical-conditions" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="emergency-contact">Emergency Contact Number</label>
+                    <input type="tel" id="emergency-contact" name="emergency-contact" required pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
+                </div>
+
+                <button type="submit">Register for Services</button>
+            </form>
+
+            <div id="registration-status" class="status-message">
+                <div class="success-message" style="display: none;">
+                    <div>Registration successful! </div>
+                    <div>Your registration ID is:</div>
+                    <span id="registration-id"></span>
+                    <div style="margin-top: 10px; font-size: 0.9em;">Please save this ID for future reference</div>
+                </div>
+                <div class="error-message" style="display: none;">
+                    Registration failed. Please try again.
+                </div>
+                <div class="already-registered-message" style="display: none;">
+                    You are already registered.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 RailMed. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Initialize location tracking
+        let userLocation = null;
+
+        function initializeLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        userLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            timestamp: new Date().toISOString(),
+                            accuracy: position.coords.accuracy
+                        };
+                        localStorage.setItem('userLocation', JSON.stringify(userLocation));
+                        console.log('Location saved:', userLocation);
+                    },
+                    function(error) {
+                        console.error('Error getting location:', error.message);
+                        alert('Please enable location services for better emergency assistance.');
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                console.log('Geolocation is not supported by this browser');
+                alert('Your browser does not support location services.');
+            }
+        }
+
+        function generateRegistrationId() {
+            // Generate a unique ID using timestamp and random number
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 1000);
+            return 'RM' + timestamp.toString().slice(-6) + random.toString().padStart(3, '0');
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            // Hide any existing success messages and clear old ID
+            const successMessage = document.querySelector('.success-message');
+            const registrationIdSpan = document.getElementById('registration-id');
+            successMessage.style.display = 'none';
+            registrationIdSpan.textContent = '';
+
+            const formData = new FormData(event.target);
+            const registrationData = {
+                id: generateRegistrationId(), // Generate new ID
+                name: formData.get('name'),
+                pnr: formData.get('pnr'),
+                age: formData.get('age'),
+                gender: formData.get('gender'),
+                medicalConditions: formData.get('medical-conditions'),
+                emergencyContact: formData.get('emergency-contact'),
+                registrationDate: new Date().toISOString(),
+                location: userLocation || JSON.parse(localStorage.getItem('userLocation') || 'null'),
+                journeyDetails: {
+                    registrationLocation: userLocation,
+                    lastUpdated: new Date().toISOString()
+                }
+            };
+
+            // Store registration in localStorage
+            let registrations = JSON.parse(localStorage.getItem('railmed_registrations') || '[]');
+            registrations.push(registrationData);
+            localStorage.setItem('railmed_registrations', JSON.stringify(registrations));
+
+            // Store current user's PNR for quick access
+            localStorage.setItem('currentUserPNR', formData.get('pnr'));
+
+            // Show success message with new registration ID
+            successMessage.style.display = 'block';
+            registrationIdSpan.textContent = registrationData.id;
+
+            // Clear form
+            event.target.reset();
+
+            // Enable offline access
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            }
+
+            // Pre-download essential medical data
+            localStorage.setItem('essential_medical_data_downloaded', 'true');
+
+            // Start continuous location tracking for emergency
+            startLocationTracking(formData.get('pnr'));
+        }
+
+        function startLocationTracking(pnr) {
+            if ("geolocation" in navigator) {
+                // Store initial location update frequency
+                localStorage.setItem('locationUpdateFrequency', '5'); // minutes
+
+                // Set up periodic location updates
+                const watchId = navigator.geolocation.watchPosition(
+                    function(position) {
+                        const locationUpdate = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            timestamp: new Date().toISOString(),
+                            accuracy: position.coords.accuracy,
+                            pnr: pnr
+                        };
+
+                        // Store last 10 location updates for the user
+                        let locationHistory = JSON.parse(localStorage.getItem(`location_history_${pnr}`) || '[]');
+                        locationHistory.unshift(locationUpdate);
+                        locationHistory = locationHistory.slice(0, 10); // Keep only last 10 updates
+                        localStorage.setItem(`location_history_${pnr}`, JSON.stringify(locationHistory));
+
+                        // Update current location
+                        localStorage.setItem('userLocation', JSON.stringify(locationUpdate));
+                    },
+                    function(error) {
+                        console.error('Location tracking error:', error.message);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+
+                // Store watch ID for cleanup
+                localStorage.setItem('locationWatchId', watchId.toString());
+            }
+        }
+
+        // Show existing registrations when the page loads
+        window.onload = function() {
+            // Hide success message and clear registration ID on page load
+            const successMessage = document.querySelector('.success-message');
+            const registrationIdSpan = document.getElementById('registration-id');
+            successMessage.style.display = 'none';
+            registrationIdSpan.textContent = '';
+            
+            // Initialize location tracking
+            initializeLocation();
+            
+            // Check for existing registrations but don't display them
+            const registrations = JSON.parse(localStorage.getItem('railmed_registrations') || '[]');
+            if (registrations.length > 0) {
+                console.log('Existing registrations:', registrations);
+            }
+        };
+    </script>
+</body>
+</html>

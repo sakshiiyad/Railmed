@@ -1,0 +1,43 @@
+{
+    "version": "1.0",
+    "lastUpdated": "2025-03-22",
+    "facilities": [
+        {
+            "id": "delhi_central",
+            "name": "Delhi Central Railway Hospital",
+            "type": "Railway Hospital",
+            "location": {
+                "lat": 28.6448,
+                "lng": 77.2167
+            },
+            "services": [
+                "24/7 Emergency",
+                "General Medicine",
+                "First Aid",
+                "Pharmacy"
+            ],
+            "contact": "011-23747100"
+        },
+        {
+            "id": "mumbai_csmt",
+            "name": "CSMT Railway Medical Center",
+            "type": "Medical Center",
+            "location": {
+                "lat": 18.9402,
+                "lng": 72.8355
+            },
+            "services": [
+                "Emergency Care",
+                "First Aid",
+                "Pharmacy"
+            ],
+            "contact": "022-22621220"
+        }
+    ],
+    "emergencyContacts": {
+        "railway_emergency": "138",
+        "medical_emergency": "108",
+        "police": "100",
+        "ambulance": "102"
+    }
+}
